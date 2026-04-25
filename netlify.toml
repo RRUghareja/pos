@@ -1,7 +1,7 @@
 [build]
   base = "."
   publish = "admin-panel/dist"
-  command = "npm --prefix backend ci && npm --prefix backend exec -- prisma generate && npm --prefix admin-panel ci && npm --prefix admin-panel run build"
+  command = "cd backend && npm ci && npx prisma generate && cd ../admin-panel && npm ci && npm run build"
 
 [functions]
   directory = "netlify/functions"
