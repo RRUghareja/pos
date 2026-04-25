@@ -1,0 +1,31 @@
+[build]
+  base = "."
+  publish = "admin-panel/dist"
+  command = "npm --prefix backend ci && npm --prefix backend exec -- prisma generate && npm --prefix admin-panel ci && npm --prefix admin-panel run build"
+
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+  included_files = [
+    "backend/node_modules/.prisma/**",
+    "backend/node_modules/@prisma/client/**",
+    "backend/prisma/**",
+  ]
+
+# Route /api/* to the serverless function
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/api/:splat"
+  status = 200
+  force = true
+
+# SPA fallback for the admin panel
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[build.environment]
+  # Tell Vite where the API lives so the admin panel calls our deployed function.
+  # Empty string means "same origin", which is what we want here.
+  VITE_API_URL = ""
