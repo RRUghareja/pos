@@ -1,12 +1,18 @@
 [build]
   base = "."
   publish = "admin-panel/dist"
-  command = "cd backend && npm ci && npx prisma generate && cd ../admin-panel && npm ci && npm run build"
+  # Netlify auto-runs `npm install` from the repo root before this command (workspaces install everything).
+  command = "cd backend && npx prisma generate && cd ../admin-panel && npm run build"
 
 [functions]
   directory = "netlify/functions"
   node_bundler = "esbuild"
+  # Prisma's client + engine are loaded at runtime via require, so we mark them
+  # external (not bundled) and bring the necessary files along with included_files.
+  external_node_modules = ["@prisma/client", ".prisma/client"]
   included_files = [
+    "node_modules/.prisma/**",
+    "node_modules/@prisma/client/**",
     "backend/node_modules/.prisma/**",
     "backend/node_modules/@prisma/client/**",
     "backend/prisma/**",
